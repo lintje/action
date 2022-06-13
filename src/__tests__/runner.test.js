@@ -1,0 +1,276 @@
+jest.mock("child_process", () => {
+  return { spawnSync: jest.fn() };
+});
+
+jest.mock("@actions/github", () => {
+  return {};
+});
+
+// Don't download lintje for this test suite to limit the network
+// traffic and speed up the tests
+jest.mock("../utils/downloader", () => {
+  return { download: jest.fn() };
+});
+
+const fs = require("fs");
+const path = require("path");
+
+const childProcess = require("child_process");
+const github = require("@actions/github");
+
+const { run } = require("../runner");
+const { download } = require("../utils/downloader");
+
+const rootDir = path.join(__dirname, "../../");
+
+describe("runner", () => {
+  function cleanup() {
+    if (fs.existsSync("lintje")) {
+      fs.rmSync(rootFile("lintje"));
+    }
+  }
+
+  beforeEach(() => {
+    // Mock default inputs
+    setInput("branch_validation", true);
+    setInput("hints", true);
+    process.exitCode = undefined; // Reset exitCode
+    cleanup();
+  });
+  afterEach(() => {
+    cleanup();
+  });
+
+  test("runs lintje passing for 1 commit", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje passing for multiple commits", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1", "commit2"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD~2...HEAD"]);
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje passing with hints", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer("Some hints output at the top\n\n1 commit and branch inspected, 0 errors detected, 1 hint"),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(stdoutSpy)
+      .toHaveBeenCalledWith(
+        expect.stringContaining(
+          "::notice::1 commit and branch inspected, 0 errors detected, 1 hint%0A%0ASome hints output at the top"
+        )
+      );
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje with issues", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 1,
+      stdout: intoBuffer("Some Lintje issues\n\n1 commit and branch inspected, 1 errors detected"),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(stdoutSpy)
+      .toHaveBeenCalledWith(
+        expect.stringContaining(
+          "::error::1 commit and branch inspected, 1 errors detected%0A%0ASome Lintje issues"
+        )
+      );
+    expect(process.exitCode).toEqual(1); // Failure
+  });
+
+  test("runs lintje with internal error", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 2,
+      stdout: intoBuffer("Some Lintje error"),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(stdoutSpy)
+      .toHaveBeenCalledWith(
+        expect.stringContaining(
+          "::error::Lintje encountered an error while performing its checks."
+        )
+      );
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some Lintje error"));
+    expect(process.exitCode).toEqual(1); // Failure
+  });
+
+  test("runs lintje with Node.js error", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    download.mockImplementation(() => {
+      throw new Error("Oh no!");
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).not.toHaveBeenCalled();
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::error::Lintje failed with error: Error: Oh no!"));
+    expect(process.exitCode).toEqual(1); // Failure
+  });
+
+  test("runs lintje without branch validation", async () => {
+    setInput("branch_validation", false);
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD", "--no-branch"]);
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje without hint validation", async () => {
+    setInput("hints", false);
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD", "--no-hints"]);
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+});
+
+
+function rootFile(filename) {
+  return path.join(rootDir, filename);
+}
+
+function intoBuffer(string) {
+  return Buffer.from(string);
+}
+
+function setInput(name, value) {
+  process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] = value;
+}
+
+function mockLintjeExecution(resultObject) {
+  childProcess.spawnSync.mockImplementation((program) => {
+    console.log({ program });
+    switch (program) {
+    case "./lintje":
+      return resultObject;
+    case "ldd": {
+      // Ubuntu (non-musl) `ldd --version` output.
+      // This means this test suite won't work on a musl system.
+      const stdout = "ldd (Ubuntu GLIBC 2.31-0ubuntu9.9) 2.31";
+      return {
+        status: 0,
+        output: [stdout],
+        stdout
+      };
+    }
+    default: {
+      const error =`Unknown program to mock: "${program}"`;
+      console.error(error);
+      throw new Error(error);
+    }
+    }
+  });
+}

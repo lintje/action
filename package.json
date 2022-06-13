@@ -1,0 +1,31 @@
+{
+  "name": "lintje",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "build": "ncc build src/index.js --out dist",
+    "test": "jest --runInBand",
+    "lint": "eslint .",
+    "lint:write": "eslint --fix .",
+    "lint-staged": "lint-staged"
+  },
+  "dependencies": {
+    "@actions/core": "^1.8.2",
+    "@actions/github": "^5.0.3",
+    "node-fetch": "^2",
+    "tar": "^6.1.11"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.34.0",
+    "eslint": "^8.18.0",
+    "eslint-plugin-jest": "^26.5.3",
+    "husky": "^8.0.1",
+    "jest": "^28.1.1",
+    "lint-staged": "^13.0.2"
+  }
+}
