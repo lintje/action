@@ -1,6 +1,6 @@
 # Lintje changelog
 
-## Next version
+## v0.7.1 - updated 2022-06-25
 
 ### Added
 
