@@ -41,7 +41,7 @@ workflow](https://docs.github.com/en/actions/quickstart) or add it to an
 existing workflow that already does testing and linting steps.
 
 Add steps that uses the `actions/checkout@v2` and
-`tombruijn/lintje-action@v0.7.1` actions like shown below.
+`lintje/action@v0.7.1` actions like shown below.
 
 ```yaml
 name: "Your workflow name"
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # Fetch depth is required
-      - uses: tombruijn/lintje-action@v0.7.1
+      - uses: lintje/action@v0.7.1
 ```
 
 ### Checkout fetch-depth
@@ -98,7 +98,7 @@ Lintje](https://lintje.dev/docs/configuration/).
 ### Example configuration
 
 ```yaml
-- uses: tombruijn/lintje-action@v0.7.1
+- uses: lintje/action@v0.7.1
   inputs:
     branch_validation: false # Turn off branch validation. On by default
     hints: false # Turn off hints. On by default
