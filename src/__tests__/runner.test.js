@@ -6,6 +6,13 @@ jest.mock("@actions/github", () => {
   return {};
 });
 
+jest.mock("@actions/cache", () => {
+  return {
+    saveCache: jest.fn(),
+    restoreCache: jest.fn()
+  };
+});
+
 // Don't download lintje for this test suite to limit the network
 // traffic and speed up the tests
 jest.mock("../utils/downloader", () => {
@@ -17,7 +24,9 @@ const path = require("path");
 
 const childProcess = require("child_process");
 const github = require("@actions/github");
+const cache = require("@actions/cache");
 
+const { LINTJE_VERSION } = require("../version");
 const { run } = require("../runner");
 const { download } = require("../utils/downloader");
 
@@ -233,6 +242,60 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD", "--no-hints"]);
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("without cache it downloads Lintje", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+    cache.restoreCache.mockImplementation(() => {
+      return undefined;
+    });
+
+    await run();
+
+    expect(cache.restoreCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`, []);
+    expect(cache.saveCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`);
+    expect(download).toHaveBeenCalled();
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("with cache it doesn't download Lintje", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+    cache.restoreCache.mockImplementation(() => {
+      return "Some cache id";
+    });
+
+    await run();
+
+    expect(cache.restoreCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`, []);
+    expect(cache.saveCache).not.toHaveBeenCalled();
+    expect(download).not.toHaveBeenCalled();
+    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
     expect(process.exitCode).toBeUndefined(); // Success
   });
 });

@@ -2,7 +2,9 @@ const childProcess = require("child_process");
 
 const core = require("@actions/core");
 const github = require("@actions/github");
+const cache = require("@actions/cache");
 
+const { LINTJE_VERSION } = require("./version");
 const { download } = require("./utils");
 
 function runLintje(commitCount) {
@@ -57,9 +59,26 @@ function handleFailure(stdout) {
   core.setFailed(formatOutput(statusLine, issueLines));
 }
 
+async function downloadIfNotCached() {
+  const paths = ["lintje"];
+  const cacheKey = `lintje-${LINTJE_VERSION}`;
+  const cacheId = await cache.restoreCache(paths, cacheKey, []);
+
+  if (cacheId) {
+    // The cache has been restored, no need to download Lintje.
+    return;
+  }
+
+  await download();
+
+  // Store Lintje in the cache for next time so it doesn't need to download
+  // it again.
+  await cache.saveCache(paths, cacheKey);
+}
+
 async function main() {
   try {
-    await download();
+    await downloadIfNotCached();
     const { context } = github;
     const { payload } = context;
     const commitCount = payload.commits.length;
