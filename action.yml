@@ -9,6 +9,10 @@ inputs:
     description: "Branch name validation to write better branch names"
     required: false
     default: "true"
+  color:
+    description: "Colorize the Lintje output."
+    required: false
+    default: "true"
   hints:
     description: "Lintje hints to write better commits"
     required: false

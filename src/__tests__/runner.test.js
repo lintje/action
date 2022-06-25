@@ -31,6 +31,7 @@ const { run } = require("../runner");
 const { download } = require("../utils/downloader");
 
 const rootDir = path.join(__dirname, "../../");
+const colorEnv = { TERM: "xterm-256color" };
 
 describe("runner", () => {
   function cleanup() {
@@ -43,6 +44,7 @@ describe("runner", () => {
     // Mock default inputs
     setInput("branch_validation", true);
     setInput("hints", true);
+    setInput("color", true);
     process.exitCode = undefined; // Reset exitCode
     cleanup();
   });
@@ -68,7 +70,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
     expect(process.exitCode).toBeUndefined(); // Success
   });
@@ -91,7 +97,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD~2...HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD~2...HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
     expect(process.exitCode).toBeUndefined(); // Success
   });
@@ -114,7 +124,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
         expect.stringContaining(
@@ -142,7 +156,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
         expect.stringContaining(
@@ -170,7 +188,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
         expect.stringContaining(
@@ -219,7 +241,11 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD", "--no-branch"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--no-branch", "--color"],
+      { env: colorEnv }
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 
@@ -241,7 +267,37 @@ describe("runner", () => {
 
     await run();
 
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD", "--no-hints"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--no-hints", "--color"],
+      { env: colorEnv }
+    );
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje without color", async () => {
+    setInput("color", false);
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD"],
+      { env: {} }
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 
@@ -268,7 +324,11 @@ describe("runner", () => {
     expect(cache.restoreCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`, []);
     expect(cache.saveCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`);
     expect(download).toHaveBeenCalled();
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 
@@ -295,7 +355,11 @@ describe("runner", () => {
     expect(cache.restoreCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`, []);
     expect(cache.saveCache).not.toHaveBeenCalled();
     expect(download).not.toHaveBeenCalled();
-    expect(childProcess.spawnSync).toHaveBeenCalledWith("./lintje", ["HEAD"]);
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 });

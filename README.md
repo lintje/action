@@ -81,16 +81,21 @@ number.
 Like Lintje itself, the Lintje GitHub Action has minimal configuration.
 The following configuration options are available.
 
-- `branch_validation`:
-    - Disable Lintje Git branch validation.
-      This is the equivalent of calling `lintje --no-branch`.
+- `branch_validation` (Default value: `true`):
+    - Configure Lintje's Git branch validation.
+      Setting this to `false` is the equivalent of calling `lintje --no-branch`.
       Read more about the [`--no-branch` CLI
       flag](https://lintje.dev/docs/usage/#branch-validation).
-- `hints`:
-    - Disable Lintje's hints. Hints will not fail the validation.
-      This is the equivalent of calling `lintje --no-hints`.
+- `hints` (Default value: `true`):
+    - Configure Lintje's hints output. Hints will not fail the validation.
+      Settings this to `false` is the equivalent of calling `lintje --no-hints`.
       Read more about the [`--no-hints` CLI
       flag](https://lintje.dev/docs/usage/#hints).
+- `color` (Default value: `true`):
+    - Configure Lintje's colorized output.
+      Setting this to `false` is the equivalent of calling `lintje --no-color`.
+      Read more about the [`--no-color` CLI
+      flag](https://lintje.dev/docs/usage/#colorized-output).
 
 Read more about [how to configure
 Lintje](https://lintje.dev/docs/configuration/).

@@ -9,6 +9,7 @@ const { download } = require("./utils");
 
 function runLintje(commitCount) {
   const commitRange = commitArgument(commitCount);
+  const env = {};
   const args = [commitRange];
   const branchValidation = core.getBooleanInput("branch_validation", { required: false });
   if (branchValidation === false) {
@@ -18,8 +19,15 @@ function runLintje(commitCount) {
   if (hints === false) {
     args.push("--no-hints");
   }
+  const color = core.getBooleanInput("color", { required: false });
+  if (color === true) {
+    args.push("--color");
+    // Add TERM environment variable so the Lintje color support detection
+    // thinks it supports color output. Otherwise it doesn't.
+    env["TERM"] = "xterm-256color";
+  }
   core.debug(`Lintje arguments: ${args}`);
-  const result = childProcess.spawnSync("./lintje", args);
+  const result = childProcess.spawnSync("./lintje", args, { env });
   return {
     ...result,
     stdout: (result.stdout || "").toString(),
