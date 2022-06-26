@@ -41,7 +41,7 @@ workflow](https://docs.github.com/en/actions/quickstart) or add it to an
 existing workflow that already does testing and linting steps.
 
 Add steps that uses the `actions/checkout@v2` and
-`lintje/action@v0.7.1` actions like shown below.
+`lintje/action@v0.7` actions like shown below.
 
 ```yaml
 name: "Your workflow name"
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # Fetch depth is required
-      - uses: lintje/action@v0.7.1
+      - uses: lintje/action@v0.7
 ```
 
 ### Checkout fetch-depth
@@ -103,7 +103,7 @@ Lintje](https://lintje.dev/docs/configuration/).
 ### Example configuration
 
 ```yaml
-- uses: lintje/action@v0.7.1
+- uses: lintje/action@v0.7
   inputs:
     branch_validation: false # Turn off branch validation. On by default
     hints: false # Turn off hints. On by default
@@ -120,7 +120,10 @@ steps:
 - Update the GitHub Action to match any changed behavior or add new config
   options.
 - Tag the new release in Git using the same version number: `git tag v#.#.#`
-- Push the updated GitHub Action.
+- Tag the new release in Git using the minor version number: `git tag v#.#`
+- Push the updated GitHub Action branches with the multiple tags.
+- Create a new release on GitHub and publish the new release to the
+  GitHub marketplace.
 
 ## Code of Conduct
 
