@@ -379,7 +379,6 @@ function setInput(name, value) {
 
 function mockLintjeExecution(resultObject) {
   childProcess.spawnSync.mockImplementation((program) => {
-    console.log({ program });
     switch (program) {
     case "./lintje":
       return resultObject;
