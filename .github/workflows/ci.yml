@@ -37,6 +37,16 @@ jobs:
         run: npm ci
       - name: Run ESLint
         run: npm run lint
+  lintje:
+    name: Lint Git (Lintje)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+      - name: Run Lintje
+        uses: lintje/action@main
 
   analyze: # Run CodeQL on branch
     name: Analyze code
