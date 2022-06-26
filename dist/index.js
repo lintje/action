@@ -69310,7 +69310,7 @@ async function main() {
       core.error((stderr || "").toString());
       break;
     default:
-      core.setFailed("Unknown exit code received from Lintje:", status);
+      core.setFailed(`Unknown exit code received from Lintje: ${status}`);
       core.info(stdout);
       core.error((stderr || "").toString());
       break;
