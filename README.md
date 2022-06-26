@@ -4,7 +4,7 @@ Validate Git commits on every push with GitHub Actions. Learn more about Lintje
 on the [Lintje.dev website][website].
 
 <div align="center">
-  <b><a href="https://lintje.dev">Lintje.dev website</a></b>
+  <b><a href="https://lintje.dev">Lintje.dev website</a> | <a href="https://github.com/marketplace/actions/lintje">Lintje on GitHub marketplace</a></b>
 </div>
 
 ---
@@ -115,7 +115,7 @@ To update the Lintje GitHub Action to the latest Lintje release, follow these
 steps:
 
 - Update the `src/version.js` file to the new version number.
-- Update this `README.md` file to the use the new version number.
+- Update this `README.md` file to use the new version number.
 - Update the `checksums_256.txt` file with the file included in the new release.
 - Update the GitHub Action to match any changed behavior or add new config
   options.
