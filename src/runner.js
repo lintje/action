@@ -49,14 +49,16 @@ function splitOutput(stdout) {
   return { statusLine, issueLines };
 }
 
-function formatOutput(statusLine, issueLines) {
-  return `${statusLine}\n\n${issueLines}`.trim();
+function removeColorOutput(string) {
+  /* eslint-disable-next-line no-control-regex */
+  return string.replace(/\x1B\[\d{1,2}m/g, "");
 }
 
 function handleSuccess(stdout) {
   const { statusLine, issueLines } = splitOutput(stdout);
   if (statusLine.endsWith(" hint") || statusLine.endsWith(" hints")) {
-    core.notice(formatOutput(statusLine, issueLines));
+    core.info(issueLines);
+    core.notice(removeColorOutput(statusLine));
   } else {
     core.notice("Lintje has found no issues.");
   }
@@ -64,7 +66,8 @@ function handleSuccess(stdout) {
 
 function handleFailure(stdout) {
   let { statusLine, issueLines } = splitOutput(stdout);
-  core.setFailed(formatOutput(statusLine, issueLines));
+  core.info(issueLines);
+  core.setFailed(removeColorOutput(statusLine));
 }
 
 async function downloadIfNotCached() {

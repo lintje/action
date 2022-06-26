@@ -1,5 +1,12 @@
 # Lintje changelog
 
+## v0.7.1 - updated 2022-06-26
+
+### Fixed
+
+- Remove colorized output from GitHub workflow summary annotations. Colorized
+  messages do not render properly there.
+
 ## v0.7.1 - updated 2022-06-25
 
 ### Added

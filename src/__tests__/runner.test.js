@@ -129,10 +129,11 @@ describe("runner", () => {
       ["HEAD", "--color"],
       { env: colorEnv }
     );
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some hints output at the top"));
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
         expect.stringContaining(
-          "::notice::1 commit and branch inspected, 0 errors detected, 1 hint%0A%0ASome hints output at the top"
+          "::notice::1 commit and branch inspected, 0 errors detected, 1 hint"
         )
       );
     expect(process.exitCode).toBeUndefined(); // Success
@@ -161,11 +162,10 @@ describe("runner", () => {
       ["HEAD", "--color"],
       { env: colorEnv }
     );
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some Lintje issues"));
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
-        expect.stringContaining(
-          "::error::1 commit and branch inspected, 1 errors detected%0A%0ASome Lintje issues"
-        )
+        expect.stringContaining("::error::1 commit and branch inspected, 1 errors detected")
       );
     expect(process.exitCode).toEqual(1); // Failure
   });
@@ -273,6 +273,34 @@ describe("runner", () => {
       { env: colorEnv }
     );
     expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("strips color of notice", async () => {
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+    mockLintjeExecution({
+      status: 1,
+      stdout: intoBuffer("Some \u{1b}[0mcolored error lines\n\n1 commit and branch inspected, \u{1b}[0m\u{1b}[31m3 errors detected\u{1b}[0m"),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(process.exitCode).toEqual(1); // Failure
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      "./lintje",
+      ["HEAD", "--color"],
+      { env: colorEnv }
+    );
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some \u{1b}[0mcolored error lines"));
+    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::error::1 commit and branch inspected, 3 errors detected"));
   });
 
   test("runs lintje without color", async () => {
