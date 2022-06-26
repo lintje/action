@@ -33,6 +33,8 @@ const { download } = require("../utils/downloader");
 const rootDir = path.join(__dirname, "../../");
 const colorEnv = { TERM: "xterm-256color" };
 
+const annotationOptions = "title=Lintje (Git Linter)";
+
 describe("runner", () => {
   function cleanup() {
     if (fs.existsSync("lintje")) {
@@ -75,7 +77,9 @@ describe("runner", () => {
       ["HEAD", "--color"],
       { env: colorEnv }
     );
-    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
+    expect(stdoutSpy).toHaveBeenCalledWith(
+      expect.stringContaining(`::notice ${annotationOptions}::Lintje has found no issues.`)
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 
@@ -102,7 +106,9 @@ describe("runner", () => {
       ["HEAD~2...HEAD", "--color"],
       { env: colorEnv }
     );
-    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::notice::Lintje has found no issues."));
+    expect(stdoutSpy).toHaveBeenCalledWith(
+      expect.stringContaining(`::notice ${annotationOptions}::Lintje has found no issues.`)
+    );
     expect(process.exitCode).toBeUndefined(); // Success
   });
 
@@ -133,7 +139,7 @@ describe("runner", () => {
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
         expect.stringContaining(
-          "::notice::1 commit and branch inspected, 0 errors detected, 1 hint"
+          `::notice ${annotationOptions}::1 commit and branch inspected, 0 errors detected, 1 hint`
         )
       );
     expect(process.exitCode).toBeUndefined(); // Success
@@ -195,9 +201,7 @@ describe("runner", () => {
     );
     expect(stdoutSpy)
       .toHaveBeenCalledWith(
-        expect.stringContaining(
-          "::error::Lintje encountered an error while performing its checks."
-        )
+        expect.stringContaining("::error::Lintje encountered an error while performing its checks.")
       );
     expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some Lintje error"));
     expect(process.exitCode).toEqual(1); // Failure
@@ -219,7 +223,9 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).not.toHaveBeenCalled();
-    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::error::Lintje failed with error: Error: Oh no!"));
+    expect(stdoutSpy).toHaveBeenCalledWith(
+      expect.stringContaining("::error::Lintje failed with error: Error: Oh no!")
+    );
     expect(process.exitCode).toEqual(1); // Failure
   });
 
@@ -300,7 +306,9 @@ describe("runner", () => {
       { env: colorEnv }
     );
     expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("Some \u{1b}[0mcolored error lines"));
-    expect(stdoutSpy).toHaveBeenCalledWith(expect.stringContaining("::error::1 commit and branch inspected, 3 errors detected"));
+    expect(stdoutSpy).toHaveBeenCalledWith(
+      expect.stringContaining("::error::1 commit and branch inspected, 3 errors detected")
+    );
   });
 
   test("runs lintje without color", async () => {

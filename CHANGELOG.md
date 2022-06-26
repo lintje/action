@@ -2,6 +2,11 @@
 
 ## v0.7.1 - updated 2022-06-26
 
+### Changed
+
+- Add titles to Lintje annotations. Makes it easier to tell which action the
+  annotation is coming from.
+
 ### Fixed
 
 - Remove colorized output from GitHub workflow summary annotations. Colorized

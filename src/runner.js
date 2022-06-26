@@ -7,6 +7,8 @@ const cache = require("@actions/cache");
 const { LINTJE_VERSION } = require("./version");
 const { download } = require("./utils");
 
+const annotationOptions = { title: "Lintje (Git Linter)" };
+
 function runLintje(commitCount) {
   const commitRange = commitArgument(commitCount);
   const env = {};
@@ -58,9 +60,9 @@ function handleSuccess(stdout) {
   const { statusLine, issueLines } = splitOutput(stdout);
   if (statusLine.endsWith(" hint") || statusLine.endsWith(" hints")) {
     core.info(issueLines);
-    core.notice(removeColorOutput(statusLine));
+    logNotice(removeColorOutput(statusLine));
   } else {
-    core.notice("Lintje has found no issues.");
+    logNotice("Lintje has found no issues.");
   }
 }
 
@@ -87,6 +89,18 @@ async function downloadIfNotCached() {
   await cache.saveCache(paths, cacheKey);
 }
 
+function logNotice(string) {
+  core.notice(string, annotationOptions);
+}
+
+function logWarning(string) {
+  core.warning(string, annotationOptions);
+}
+
+function logError(string) {
+  core.error(string, annotationOptions);
+}
+
 async function main() {
   try {
     await downloadIfNotCached();
@@ -97,7 +111,7 @@ async function main() {
 
     if (error) {
       core.info(stdout);
-      core.warning((stderr || "").toString());
+      logWarning((stderr || "").toString());
       core.setFailed(`Lintje failed with status code "${status}": ${error}`);
       return;
     }
@@ -107,25 +121,25 @@ async function main() {
       handleSuccess(stdout);
 
       if (stderr) {
-        core.warning(stderr.toString());
+        logWarning(stderr.toString());
       }
       break;
     case 1: // Lintje found issues
       handleFailure(stdout);
 
       if (stderr) {
-        core.warning(stderr.toString());
+        logWarning(stderr.toString());
       }
       break;
     case 2: // Internal Lintje failure
       core.setFailed("Lintje encountered an error while performing its checks.");
       core.info(stdout);
-      core.error((stderr || "").toString());
+      logError((stderr || "").toString());
       break;
     default:
       core.setFailed(`Unknown exit code received from Lintje: ${status}`);
       core.info(stdout);
-      core.error((stderr || "").toString());
+      logError((stderr || "").toString());
       break;
     }
   } catch (error) {
