@@ -69219,11 +69219,18 @@ function runLintje(commitCount) {
     env["TERM"] = "xterm-256color";
   }
   core.debug(`Lintje arguments: ${args}`);
-  const result = childProcess.spawnSync("./lintje", args, { env });
+  const result = childProcess.spawnSync(executable(), args, { env });
   return {
     ...result,
     stdout: (result.stdout || "").toString(),
   };
+}
+
+function executable() {
+  if (process.platform === "win32") {
+    return "./lintje.exe";
+  }
+  return "./lintje";
 }
 
 function commitArgument(commitCount) {

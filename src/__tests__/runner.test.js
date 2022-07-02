@@ -73,7 +73,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -102,7 +102,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD~2...HEAD", "--color"],
       { env: colorEnv }
     );
@@ -131,7 +131,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -164,7 +164,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -195,7 +195,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -248,7 +248,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--no-branch", "--color"],
       { env: colorEnv }
     );
@@ -274,7 +274,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--no-hints", "--color"],
       { env: colorEnv }
     );
@@ -301,7 +301,7 @@ describe("runner", () => {
 
     expect(process.exitCode).toEqual(1); // Failure
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -330,7 +330,7 @@ describe("runner", () => {
     await run();
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD"],
       { env: {} }
     );
@@ -361,7 +361,7 @@ describe("runner", () => {
     expect(cache.saveCache).toHaveBeenCalledWith(["lintje"], `lintje-${LINTJE_VERSION}`);
     expect(download).toHaveBeenCalled();
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -392,7 +392,7 @@ describe("runner", () => {
     expect(cache.saveCache).not.toHaveBeenCalled();
     expect(download).not.toHaveBeenCalled();
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
-      "./lintje",
+      executable(),
       ["HEAD", "--color"],
       { env: colorEnv }
     );
@@ -400,6 +400,12 @@ describe("runner", () => {
   });
 });
 
+function executable() {
+  if (process.platform === "win32") {
+    return "./lintje.exe";
+  }
+  return "./lintje";
+}
 
 function rootFile(filename) {
   return path.join(rootDir, filename);
@@ -416,6 +422,8 @@ function setInput(name, value) {
 function mockLintjeExecution(resultObject) {
   childProcess.spawnSync.mockImplementation((program) => {
     switch (program) {
+    case "./lintje.exe":
+      return resultObject;
     case "./lintje":
       return resultObject;
     case "ldd": {

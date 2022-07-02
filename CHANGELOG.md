@@ -1,5 +1,10 @@
 # Lintje changelog
 
+## v0.7.1-1 - 2022-07-02
+
+- Fix the executable name for Microsoft Windows hosts. It did not call the
+  `lintje.exe` executable on Microsoft Windows. It missed the `.exe` extension.
+
 ## v0.7.1 - updated 2022-06-26
 
 ### Changed
