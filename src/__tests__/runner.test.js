@@ -331,7 +331,7 @@ describe("runner", () => {
 
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
       executable(),
-      ["HEAD"],
+      ["HEAD", "--no-color"],
       { env: {} }
     );
     expect(process.exitCode).toBeUndefined(); // Success

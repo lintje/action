@@ -69217,6 +69217,8 @@ function runLintje(commitCount) {
     // Add TERM environment variable so the Lintje color support detection
     // thinks it supports color output. Otherwise it doesn't.
     env["TERM"] = "xterm-256color";
+  } else {
+    args.push("--no-color");
   }
   core.debug(`Lintje arguments: ${args}`);
   const result = childProcess.spawnSync(executable(), args, { env });
@@ -69524,7 +69526,7 @@ module.exports = {
 /***/ 9554:
 /***/ ((module) => {
 
-const LINTJE_VERSION = "0.7.1";
+const LINTJE_VERSION = "0.8.0";
 
 module.exports = { LINTJE_VERSION };
 

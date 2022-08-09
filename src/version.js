@@ -1,3 +1,3 @@
-const LINTJE_VERSION = "0.7.1";
+const LINTJE_VERSION = "0.8.0";
 
 module.exports = { LINTJE_VERSION };
