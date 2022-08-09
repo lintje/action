@@ -69526,7 +69526,7 @@ module.exports = {
 /***/ 9554:
 /***/ ((module) => {
 
-const LINTJE_VERSION = "0.8.0";
+const LINTJE_VERSION = "0.9.0";
 
 module.exports = { LINTJE_VERSION };
 
