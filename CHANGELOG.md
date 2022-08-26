@@ -1,5 +1,14 @@
 # Lintje changelog
 
+## v0.9.0 - 2022-08-07
+
+- Update to Lintje 0.9.0.
+
+## v0.8.0 - 2022-08-01
+
+- Update to Lintje 0.8.0.
+- Enable color by default: the `color` option is set to `true` by default.
+
 ## v0.7.1-1 - 2022-07-02
 
 - Fix the executable name for Microsoft Windows hosts. It did not call the

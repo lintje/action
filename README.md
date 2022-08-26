@@ -119,6 +119,7 @@ steps:
 - Update the `checksums_256.txt` file with the file included in the new release.
 - Update the GitHub Action to match any changed behavior or add new config
   options.
+- Update the `CHANGELOG.md` file with the latest changes.
 - Tag the new release in Git using the same version number: `git tag v#.#.#`
 - Tag the new release in Git using the minor version number: `git tag v#.#`
 - Push the updated GitHub Action branches with the multiple tags.
