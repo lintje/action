@@ -1,5 +1,9 @@
 # Lintje changelog
 
+## v0.10.0 - 2022-08-26
+
+- Update to Lintje 0.10.0.
+
 ## v0.9.0 - 2022-08-07
 
 - Update to Lintje 0.9.0.
