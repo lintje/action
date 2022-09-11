@@ -96,6 +96,11 @@ The following configuration options are available.
       Setting this to `false` is the equivalent of calling `lintje --no-color`.
       Read more about the [`--no-color` CLI
       flag](https://lintje.dev/docs/usage/#colorized-output).
+- `verbose` (Default value: `false`):
+    - Configure Lintje's verbose mode.
+      Setting this to `true` is the equivalent of calling `lintje --verbose`.
+      Read more about the [`--verbose` CLI
+      flag](https://lintje.dev/docs/usage/#verbose-output).
 
 Read more about [how to configure
 Lintje](https://lintje.dev/docs/configuration/).

@@ -47,6 +47,7 @@ describe("runner", () => {
     setInput("branch_validation", true);
     setInput("hints", true);
     setInput("color", true);
+    setInput("verbose", false);
     process.exitCode = undefined; // Reset exitCode
     cleanup();
   });
@@ -333,6 +334,32 @@ describe("runner", () => {
       executable(),
       ["HEAD", "--no-color"],
       { env: {} }
+    );
+    expect(process.exitCode).toBeUndefined(); // Success
+  });
+
+  test("runs lintje with verbose mode", async () => {
+    setInput("verbose", true);
+    // Mock event payload for the GitHub Action
+    github.context = {
+      payload: {
+        commits: ["commit1"]
+      }
+    };
+
+    mockLintjeExecution({
+      status: 0,
+      stdout: intoBuffer(""),
+      stderr: intoBuffer(""),
+      error: null,
+    });
+
+    await run();
+
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      executable(),
+      ["HEAD", "--color", "--verbose"],
+      { env: colorEnv }
     );
     expect(process.exitCode).toBeUndefined(); // Success
   });

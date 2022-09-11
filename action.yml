@@ -17,6 +17,10 @@ inputs:
     description: "Lintje hints to write better commits"
     required: false
     default: "true"
+  verbose:
+    description: "Lintje prints verbose output of all checked commits and branches"
+    required: false
+    default: "false"
 branding:
   icon: "check-square"
   color: "purple"

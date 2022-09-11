@@ -69874,6 +69874,10 @@ function runLintje(commitCount) {
   } else {
     args.push("--no-color");
   }
+  const verbose = core.getBooleanInput("verbose", { required: false });
+  if (verbose === true) {
+    args.push("--verbose");
+  }
   core.debug(`Lintje arguments: ${args}`);
   const result = childProcess.spawnSync(executable(), args, { env });
   return {

@@ -3,6 +3,8 @@
 ## v0.11.0 - 2022-09-11
 
 - Update to Lintje 0.11.0.
+- Add verbose mode option. Set the verbose option to true to have Lintje print
+  more context about checked commits and branches.
 
 ## v0.10.0 - 2022-08-26
 
