@@ -69963,7 +69963,12 @@ async function main() {
     await downloadIfNotCached();
     const { context } = github;
     const { payload } = context;
-    const commitCount = payload.commits.length;
+    let commitCount;
+    if (payload.pull_request) {
+      commitCount = payload.pull_request.commits;
+    } else {
+      commitCount = payload.commits.length;
+    }
     const { status, stdout, stderr, error } = runLintje(commitCount);
 
     if (error) {

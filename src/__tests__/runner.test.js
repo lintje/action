@@ -425,6 +425,38 @@ describe("runner", () => {
     );
     expect(process.exitCode).toBeUndefined(); // Success
   });
+
+  describe("pull_request event", () => {
+    test("with pull request it passes", async () => {
+      github.context = { // Mock event payload for the GitHub Action
+        payload: {
+          pull_request: {
+            commits: 1
+          }
+        }
+      };
+
+      const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation();
+      mockLintjeExecution({
+        status: 0,
+        stdout: intoBuffer(""),
+        stderr: intoBuffer(""),
+        error: null,
+      });
+
+      await run();
+
+      expect(childProcess.spawnSync).toHaveBeenCalledWith(
+        executable(),
+        ["HEAD", "--color"],
+        { env: colorEnv }
+      );
+      expect(stdoutSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`::notice ${annotationOptions}::Lintje has found no issues.`)
+      );
+      expect(process.exitCode).toBeUndefined(); // Success
+    });
+  });
 });
 
 function executable() {
