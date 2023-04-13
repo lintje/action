@@ -1,5 +1,9 @@
 # Lintje changelog
 
+## v0.11.3-1 - 2023-04-13
+
+- Update xml2js, @azure/ms-rest-js and @azure/storage-blob dependencies.
+
 ## v0.11.3 - 2023-01-28
 
 - Update to Lintje 0.11.3.
