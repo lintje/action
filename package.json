@@ -19,7 +19,7 @@
     "@actions/core": "^1.9.1",
     "@actions/github": "^5.0.3",
     "node-fetch": "^2",
-    "tar": "^6.1.11"
+    "tar": "^6.2.1"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.34.0",
