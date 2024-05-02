@@ -40,7 +40,7 @@ Create a new [GitHub Actions
 workflow](https://docs.github.com/en/actions/quickstart) or add it to an
 existing workflow that already does testing and linting steps.
 
-Add steps that uses the `actions/checkout@v2` and
+Add steps that uses the `actions/checkout@v4` and
 `lintje/action@v0.11` actions like shown below.
 
 ```yaml
@@ -52,7 +52,7 @@ jobs:
     name: "Lintje (Git linter)"
     runs-on: ubuntu-latest # Supported on ubuntu, macOS and Microsoft Windows
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Fetch depth is required
       - uses: lintje/action@v0.11
@@ -60,7 +60,7 @@ jobs:
 
 ### Checkout fetch-depth
 
-Configure the `actions/checkout@v2` action to use `fetch-depth: 0` to fetch the
+Configure the `actions/checkout@v4` action to use `fetch-depth: 0` to fetch the
 entire Git history of the repository. By default the checkout action only
 fetches the last commit, which makes it impossible for Lintje to test multiple
 commits if more than one commit was pushed. The `fetch-depth: 0` value means
