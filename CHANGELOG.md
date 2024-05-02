@@ -1,5 +1,11 @@
 # Lintje changelog
 
+## v0.11.3-2 - 2024-05-02
+
+- Update Action to use Node.js version 20.
+- Update yaml, tough-cookie, @azule/ms-rest-js, semver, word-rap,
+  @babel/traverse and tar dependencies.
+
 ## v0.11.3-1 - 2023-04-13
 
 - Update xml2js, @azure/ms-rest-js and @azure/storage-blob dependencies.
