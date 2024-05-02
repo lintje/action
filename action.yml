@@ -2,7 +2,7 @@ name: "Lintje"
 description: "A Git Linter for People. Validate your commits on every push."
 author: "Tom de Bruijn <tom@tomdebruijn.com>"
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 inputs:
   branch_validation:
