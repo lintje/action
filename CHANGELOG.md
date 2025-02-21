@@ -1,5 +1,10 @@
 # Lintje changelog
 
+## v0.11.3-3 - 2025-02-21
+
+- Fix Pull Request events checking more commits than they should.
+- Update GitHub action dependencies.
+
 ## v0.11.3-2 - 2024-05-02
 
 - Update Action to use Node.js version 20.

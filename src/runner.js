@@ -9,8 +9,7 @@ const { download } = require("./utils");
 
 const annotationOptions = { title: "Lintje (Git Linter)" };
 
-function runLintje(commitCount) {
-  const commitRange = commitArgument(commitCount);
+function runLintje(commitRange) {
   const env = {};
   const args = [commitRange];
   const branchValidation = core.getBooleanInput("branch_validation", { required: false });
@@ -49,13 +48,6 @@ function executable() {
   return "./lintje";
 }
 
-function commitArgument(commitCount) {
-  if (commitCount > 1) {
-    return `HEAD~${commitCount}...HEAD`;
-  }
-  return "HEAD";
-}
-
 function splitOutput(stdout) {
   const lines = stdout.trim().split("\n");
   const maxLineIndex = lines.length - 1;
@@ -71,6 +63,7 @@ function removeColorOutput(string) {
 
 function handleSuccess(stdout) {
   const { statusLine, issueLines } = splitOutput(stdout);
+  core.info(stdout);
   if (statusLine.endsWith(" hint") || statusLine.endsWith(" hints")) {
     core.info(issueLines);
     logNotice(removeColorOutput(statusLine));
@@ -119,13 +112,18 @@ async function main() {
     await downloadIfNotCached();
     const { context } = github;
     const { payload } = context;
-    let commitCount;
+    let commitRange;
     if (payload.pull_request) {
-      commitCount = payload.pull_request.commits;
+      commitRange = `origin/${payload.pull_request.base.ref}...HEAD`;
     } else {
-      commitCount = payload.commits.length;
+      const commitCount = payload.commits.length;
+      if (commitCount > 1) {
+        commitRange = `HEAD~${payload.commits.length}...HEAD`;
+      } else {
+        commitRange = "HEAD";
+      }
     }
-    const { status, stdout, stderr, error } = runLintje(commitCount);
+    const { status, stdout, stderr, error } = runLintje(commitRange);
 
     if (error) {
       core.info(stdout);
