@@ -431,7 +431,9 @@ describe("runner", () => {
       github.context = { // Mock event payload for the GitHub Action
         payload: {
           pull_request: {
-            commits: 1
+            base: {
+              ref: "my-ref"
+            }
           }
         }
       };
@@ -448,7 +450,7 @@ describe("runner", () => {
 
       expect(childProcess.spawnSync).toHaveBeenCalledWith(
         executable(),
-        ["HEAD", "--color"],
+        ["origin/my-ref...HEAD", "--color"],
         { env: colorEnv }
       );
       expect(stdoutSpy).toHaveBeenCalledWith(
