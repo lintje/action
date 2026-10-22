@@ -2,16 +2,28 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-function fetchChecksums() {
+// Parse the contents of a checksum manifest into an object of archive
+// filenames and their checksums.
+function parseChecksums(contents) {
   const checksums = {};
-  const filename = path.join(__dirname, "../../checksums_256.txt");
-  const contents = fs.readFileSync(filename, { encoding: "utf8" }).trim();
-  const lines = contents.split("\n");
+  // Git checks text files out with CRLF line endings on Windows, so split on
+  // both line ending styles to keep a trailing carriage return out of the
+  // filenames.
+  const lines = contents.split(/\r?\n/);
   for (let line of lines) {
-    const [checksum, filename] = line.split("  ");
+    const [checksum, filename] = line.trim().split(/\s+/);
+    if (!checksum || !filename) {
+      continue;
+    }
     checksums[filename] = checksum;
   }
   return checksums;
+}
+
+function fetchChecksums() {
+  const filename = path.join(__dirname, "../../checksums_256.txt");
+  const contents = fs.readFileSync(filename, { encoding: "utf8" });
+  return parseChecksums(contents);
 }
 
 function verifyChecksum(filepath, checksum) {
@@ -39,5 +51,6 @@ function verifyChecksum(filepath, checksum) {
 
 module.exports = {
   fetchChecksums,
+  parseChecksums,
   verifyChecksum
 };

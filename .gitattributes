@@ -1,0 +1,9 @@
+# The checksum manifests are copied from the Lintje releases and are verified
+# against the downloaded archives, so they have to keep the exact same bytes on
+# every platform.
+checksums_256.txt text eol=lf
+dist/checksums_256.txt text eol=lf
+
+# This file is verified by checksum in the tests, so it needs to keep the same
+# line endings on every platform.
+src/utils/__tests__/test_file.txt text eol=lf
