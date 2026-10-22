@@ -1,6 +1,6 @@
 # Lintje changelog
 
-## v0.12.0-1 - 2026-08-05
+## v0.12.0-1 - 2026-10-22
 
 - Fix checksum verification on Windows.
 
