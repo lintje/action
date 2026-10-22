@@ -84,7 +84,9 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes to commit."
           else
-            git commit -m "Release v${{ steps.version.outputs.version }}"
+            git commit \
+              -m "Release v${{ steps.version.outputs.version }}" \
+              -m "Release automated via GitHub Actions."
             git push origin "HEAD:main"
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
